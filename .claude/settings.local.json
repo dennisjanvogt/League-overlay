@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(timeout:*)",
+      "Bash(dir stats.json)",
+      "Bash(del obs_overlay.html)",
+      "Bash(pip install:*)",
+      "Bash(cat:*)",
+      "Bash(pyinstaller:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

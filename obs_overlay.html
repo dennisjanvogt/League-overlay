@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>League of Legends Stats Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: transparent;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .overlay-container {
+            width: 520px;
+            padding: 0;
+        }
+
+        /* Header - Kompakt und transparent */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(10, 20, 40, 0.85);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(200, 155, 60, 0.6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .profile-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #c89b3c;
+            box-shadow: 0 0 30px rgba(200, 155, 60, 0.8);
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 28px;
+            font-weight: 900;
+            color: #c89b3c;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 1);
+            letter-spacing: 0.5px;
+        }
+
+        .player-level {
+            font-size: 18px;
+            color: #fff;
+            margin-top: 5px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+            font-weight: 600;
+        }
+
+        .view-indicator {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            margin-top: 12px;
+        }
+
+        .view-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(200, 155, 60, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(200, 155, 60, 0.5);
+        }
+
+        .view-dot.active {
+            background: #c89b3c;
+            box-shadow: 0 0 15px rgba(200, 155, 60, 1);
+            transform: scale(1.3);
+        }
+
+        .content-section {
+            min-height: 350px;
+            position: relative;
+        }
+
+        .view {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.6s ease;
+            pointer-events: none;
+        }
+
+        .view.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* Ranked Stats View - Floating Cards */
+        .rank-main-card {
+            background: rgba(10, 20, 40, 0.85);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(200, 155, 60, 0.6);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .rank-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .rank-icon {
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 0 20px rgba(200, 155, 60, 0.8));
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-tier {
+            font-size: 36px;
+            font-weight: 900;
+            color: #c89b3c;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 1);
+            letter-spacing: 2px;
+        }
+
+        .rank-lp {
+            font-size: 24px;
+            color: #ffffff;
+            margin-top: 8px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1);
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(20, 30, 50, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(200, 155, 60, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1);
+        }
+
+        .stat-value.winrate {
+            color: #4caf50;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1), 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        /* Champions View - Bigger Cards */
+        .section-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #c89b3c;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 1);
+            background: rgba(10, 20, 40, 0.85);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(200, 155, 60, 0.6);
+        }
+
+        .champion-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .champion-card {
+            text-align: center;
+            background: rgba(10, 20, 40, 0.85);
+            padding: 20px 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(200, 155, 60, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .champion-card:hover {
+            transform: translateY(-5px);
+            border-color: #c89b3c;
+            box-shadow: 0 8px 30px rgba(200, 155, 60, 0.5);
+        }
+
+        .champion-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #c89b3c;
+            margin-bottom: 12px;
+            box-shadow: 0 0 20px rgba(200, 155, 60, 0.6);
+        }
+
+        .champion-name {
+            font-size: 16px;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+        }
+
+        .mastery-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #c89b3c, #f0d068);
+            color: #000;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 900;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 15px rgba(200, 155, 60, 0.6);
+        }
+
+        .champion-points {
+            font-size: 14px;
+            color: #a0a0a0;
+            font-weight: 600;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
+        }
+
+        /* Match History - Large Cards */
+        .match-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .match-card {
+            display: flex;
+            align-items: center;
+            background: rgba(10, 20, 40, 0.85);
+            padding: 18px;
+            border-radius: 12px;
+            border-left: 5px solid #666;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .match-card.win {
+            border-left-color: #4caf50;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .match-card.loss {
+            border-left-color: #f44336;
+            box-shadow: 0 4px 20px rgba(244, 67, 54, 0.3);
+        }
+
+        .match-card:hover {
+            transform: translateX(5px);
+        }
+
+        .match-champion-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            border: 3px solid rgba(200, 155, 60, 0.6);
+            margin-right: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .match-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .match-champion-name {
+            display: none;
+        }
+
+        .match-kda {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .match-kda .kills {
+            color: #4caf50;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 1), 0 0 15px rgba(76, 175, 80, 0.6);
+        }
+
+        .match-kda .deaths {
+            color: #f44336;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 1), 0 0 15px rgba(244, 67, 54, 0.6);
+        }
+
+        .match-kda .assists {
+            color: #2196f3;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 1), 0 0 15px rgba(33, 150, 243, 0.6);
+        }
+
+        .match-kda .separator {
+            color: #888;
+            margin: 0 10px;
+            font-weight: 700;
+        }
+
+        .match-result-section {
+            text-align: right;
+        }
+
+        .match-result-text {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .match-result-text.win {
+            color: #4caf50;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1), 0 0 15px rgba(76, 175, 80, 0.6);
+        }
+
+        .match-result-text.loss {
+            color: #f44336;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1), 0 0 15px rgba(244, 67, 54, 0.6);
+        }
+
+        .match-duration {
+            font-size: 14px;
+            color: #888;
+            font-weight: 600;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+            background: rgba(10, 20, 40, 0.7);
+            border-radius: 12px;
+            border: 2px solid rgba(200, 155, 60, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .overlay-container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 24px;
+            color: #c89b3c;
+            font-weight: 700;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 1);
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay" class="loading">
+        Lade Statistiken...
+    </div>
+
+    <script>
+        let currentView = 0;
+        const views = ['ranked', 'lastgame', 'matches'];
+        const VIEW_DURATION = 10000; // 10 Sekunden pro View
+
+        function loadStats() {
+            // Cache-Busting: Füge Timestamp hinzu um Browser-Cache zu umgehen
+            fetch(`stats.json?t=${Date.now()}`)
+                .then(response => response.json())
+                .then(data => {
+                    window.statsData = data;
+                    renderOverlay(data);
+                })
+                .catch(error => {
+                    console.error('Fehler beim Laden der Stats:', error);
+                });
+        }
+
+        function renderOverlay(data) {
+            const overlayDiv = document.getElementById('overlay');
+
+            // Ranked View
+            let rankedHTML = '';
+            if (data.ranked && data.ranked.length > 0) {
+                const soloQueue = data.ranked.find(q => q.queueType === 'RANKED_SOLO_5x5') || data.ranked[0];
+                const rankIcon = getRankIcon(soloQueue.tier);
+
+                rankedHTML = `
+                    <div class="rank-main-card">
+                        <div class="rank-header">
+                            <img src="${rankIcon}" alt="Rank" class="rank-icon">
+                            <div class="rank-info">
+                                <div class="rank-tier">${soloQueue.tier} ${soloQueue.rank}</div>
+                                <div class="rank-lp">${soloQueue.leaguePoints} LP</div>
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Siege</div>
+                                <div class="stat-value">${soloQueue.wins}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Niederlagen</div>
+                                <div class="stat-value">${soloQueue.losses}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Winrate</div>
+                                <div class="stat-value winrate">${soloQueue.winrate}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                rankedHTML = '<div class="no-data-message">Keine Ranked Stats verfuegbar</div>';
+            }
+
+            // Last Game View
+            let lastGameHTML = '';
+            if (data.lastGame) {
+                const lg = data.lastGame;
+                const kda = lg.deaths > 0 ? ((lg.kills + lg.assists) / lg.deaths).toFixed(2) : 'Perfect';
+                const cs = lg.totalMinionsKilled + lg.neutralMinionsKilled;
+
+                lastGameHTML = `
+                    <div class="section-title">Letztes Spiel</div>
+                    <div class="rank-main-card" style="border-color: ${lg.win ? '#4caf50' : '#f44336'};">
+                        <div class="rank-header">
+                            <img src="${lg.championIcon}" alt="${lg.champion}" class="rank-icon" style="border-radius: 15px;">
+                            <div class="rank-info">
+                                <div class="rank-tier" style="font-size: 28px;">${lg.champion}</div>
+                                <div class="rank-lp" style="color: ${lg.win ? '#4caf50' : '#f44336'}; font-size: 20px;">
+                                    ${lg.win ? 'SIEG' : 'NIEDERLAGE'}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin: 20px 0;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <div style="font-size: 48px; font-weight: 900; letter-spacing: 3px;">
+                                    <span style="color: #4caf50; text-shadow: 3px 3px 8px rgba(0, 0, 0, 1);">${lg.kills}</span>
+                                    <span style="color: #888; margin: 0 15px;">/</span>
+                                    <span style="color: #f44336; text-shadow: 3px 3px 8px rgba(0, 0, 0, 1);">${lg.deaths}</span>
+                                    <span style="color: #888; margin: 0 15px;">/</span>
+                                    <span style="color: #2196f3; text-shadow: 3px 3px 8px rgba(0, 0, 0, 1);">${lg.assists}</span>
+                                </div>
+                                <div style="font-size: 18px; color: #c89b3c; font-weight: 700; margin-top: 10px; text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);">
+                                    KDA: ${kda}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">CS</div>
+                                <div class="stat-value">${cs}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Schaden</div>
+                                <div class="stat-value">${formatNumber(lg.totalDamageDealtToChampions)}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Vision</div>
+                                <div class="stat-value">${lg.visionScore}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Gold</div>
+                                <div class="stat-value">${formatNumber(lg.goldEarned)}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Level</div>
+                                <div class="stat-value">${lg.champLevel}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Dauer</div>
+                                <div class="stat-value">${lg.gameDuration}m</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                lastGameHTML = '<div class="no-data-message">Kein letztes Spiel verfügbar</div>';
+            }
+
+            // Matches View
+            let matchesHTML = '';
+            if (data.matches && data.matches.length > 0) {
+                const lastThreeMatches = data.matches.slice(0, 3);
+                matchesHTML = `
+                    <div class="section-title">Letzte Spiele</div>
+                    <div class="match-grid">
+                        ${lastThreeMatches.map(match => `
+                            <div class="match-card ${match.win ? 'win' : 'loss'}">
+                                <img src="${match.championIcon}" alt="${match.champion}" class="match-champion-icon">
+                                <div class="match-details">
+                                    <div class="match-champion-name">${match.champion}</div>
+                                    <div class="match-kda">
+                                        <span class="kills">${match.kills}</span>
+                                        <span class="separator">/</span>
+                                        <span class="deaths">${match.deaths}</span>
+                                        <span class="separator">/</span>
+                                        <span class="assists">${match.assists}</span>
+                                    </div>
+                                </div>
+                                <div class="match-result-section">
+                                    <div class="match-result-text ${match.win ? 'win' : 'loss'}">
+                                        ${match.win ? 'SIEG' : 'NIEDERLAGE'}
+                                    </div>
+                                    <div class="match-duration">${match.gameDuration}min</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                matchesHTML = '<div class="no-data-message">Keine Match History verfuegbar</div>';
+            }
+
+            overlayDiv.innerHTML = `
+                <div class="overlay-container">
+                    <div class="header">
+                        <img src="${data.profileIcon}" alt="Profile" class="profile-icon">
+                        <div class="player-info">
+                            <div class="player-name">${data.playerName}</div>
+                            <div class="player-level">Level ${data.level}</div>
+                            <div class="view-indicator">
+                                <div class="view-dot ${currentView === 0 ? 'active' : ''}"></div>
+                                <div class="view-dot ${currentView === 1 ? 'active' : ''}"></div>
+                                <div class="view-dot ${currentView === 2 ? 'active' : ''}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="view ${currentView === 0 ? 'active' : ''}" id="view-ranked">
+                            ${rankedHTML}
+                        </div>
+                        <div class="view ${currentView === 1 ? 'active' : ''}" id="view-lastgame">
+                            ${lastGameHTML}
+                        </div>
+                        <div class="view ${currentView === 2 ? 'active' : ''}" id="view-matches">
+                            ${matchesHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchView() {
+            if (!window.statsData) return;
+
+            currentView = (currentView + 1) % views.length;
+            renderOverlay(window.statsData);
+        }
+
+        function getRankIcon(tier) {
+            const tierLower = tier.toLowerCase();
+            return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${tierLower}.png`;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Lade Stats beim Start
+        loadStats();
+
+        // Aktualisiere Stats alle 60 Sekunden
+        setInterval(loadStats, 60000);
+
+        // Wechsle View alle 10 Sekunden
+        setInterval(switchView, VIEW_DURATION);
+    </script>
+</body>
+</html>

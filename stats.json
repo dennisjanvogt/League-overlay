@@ -1,0 +1,126 @@
+{
+  "playerName": "Piekasso#EUW",
+  "level": 124,
+  "profileIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/profileicon/589.png",
+  "ranked": [
+    {
+      "queueType": "RANKED_SOLO_5x5",
+      "tier": "BRONZE",
+      "rank": "II",
+      "leaguePoints": 70,
+      "wins": 24,
+      "losses": 32,
+      "winrate": 42.9
+    }
+  ],
+  "champions": [
+    {
+      "name": "Varus",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+      "level": 36,
+      "points": 396633
+    },
+    {
+      "name": "Malzahar",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Malzahar.png",
+      "level": 8,
+      "points": 66443
+    },
+    {
+      "name": "Ashe",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Ashe.png",
+      "level": 8,
+      "points": 66020
+    },
+    {
+      "name": "Blitzcrank",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Blitzcrank.png",
+      "level": 7,
+      "points": 45961
+    },
+    {
+      "name": "Garen",
+      "icon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Garen.png",
+      "level": 5,
+      "points": 34331
+    }
+  ],
+  "matches": [
+    {
+      "champion": "Varus",
+      "championIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+      "kills": 7,
+      "deaths": 4,
+      "assists": 10,
+      "win": true,
+      "gameDuration": 26,
+      "gameMode": "CLASSIC"
+    },
+    {
+      "champion": "Varus",
+      "championIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+      "kills": 22,
+      "deaths": 6,
+      "assists": 11,
+      "win": true,
+      "gameDuration": 32,
+      "gameMode": "CLASSIC"
+    },
+    {
+      "champion": "Varus",
+      "championIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+      "kills": 10,
+      "deaths": 5,
+      "assists": 13,
+      "win": false,
+      "gameDuration": 39,
+      "gameMode": "CLASSIC"
+    },
+    {
+      "champion": "Varus",
+      "championIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+      "kills": 19,
+      "deaths": 3,
+      "assists": 5,
+      "win": false,
+      "gameDuration": 43,
+      "gameMode": "CLASSIC"
+    },
+    {
+      "champion": "Varus",
+      "championIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+      "kills": 14,
+      "deaths": 1,
+      "assists": 2,
+      "win": true,
+      "gameDuration": 20,
+      "gameMode": "CLASSIC"
+    }
+  ],
+  "lastGame": {
+    "champion": "Varus",
+    "championIcon": "https://ddragon.leagueoflegends.com/cdn/15.19.1/img/champion/Varus.png",
+    "kills": 7,
+    "deaths": 4,
+    "assists": 10,
+    "win": true,
+    "gameDuration": 26,
+    "gameMode": "CLASSIC",
+    "totalMinionsKilled": 132,
+    "neutralMinionsKilled": 4,
+    "goldEarned": 10931,
+    "totalDamageDealtToChampions": 17562,
+    "visionScore": 17,
+    "champLevel": 13,
+    "items": [
+      1055,
+      3153,
+      3124,
+      3172,
+      3051,
+      1043,
+      3340
+    ]
+  },
+  "lastUpdate": 1759530068.1450064
+}
